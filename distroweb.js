@@ -15,6 +15,9 @@ var staticFileHandler = function(path) {
 
 var distroHandler = function (path) {
   // console.log("entering distroHandler");
+  if (path.match(/^\//)) {
+  	path = path.substr(1)
+  }
   return function (res) {
     // console.log("entering callback");
     res.writeHead(418, {'Content-Type':'text/html'});
@@ -39,8 +42,8 @@ var notFound = function(res) {
 
 var handler = function (req, res) {
 	console.log("Incoming request from " + req.socket.remoteAddress);
-  if (req.url.match(/^\/distroweb/)) {
-    distroReq = req.url.match(/^\/distroweb\/(.*)/)[1];
+  if (req.url.match(/^\/distroweb\/?/)) {
+    distroReq = req.url.match(/^\/distroweb(.*)/)[1];
     distroHandler(distroReq)(res);
   }
   else if (req.url in routes) {
