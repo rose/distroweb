@@ -25,10 +25,18 @@ var distroHandler = function (path) {
   };
 }
 
+var redirectToDistroweb = function() {
+	return function (res) {
+		res.writeHead(301,{'Location':'/distroweb'})
+		res.end()
+	}
+}
+
 var routes = {
-	"/getthis": staticFileHandler("./nodeserver.js"),
-	"/": staticFileHandler("./index.html"),
-	"/bye": staticFileHandler("./bye.html"),
+	//"/getthis": staticFileHandler("./nodeserver.js"),
+	"/": redirectToDistroweb(),
+	//"/bye": staticFileHandler("./bye.html"),
+
 	"/time": function(res) {
 		res.writeHead(418,{'Content-Type':'text/html'});
 		res.end(new Date().getTime().toString());
@@ -53,7 +61,7 @@ var handler = function (req, res) {
 	}
 };
 
-http.createServer(handler).listen(4000);
+http.createServer(handler).listen(80);
 //http.createServer(function() {
 
 
