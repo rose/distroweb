@@ -42,7 +42,7 @@ var notFound = function(res) {
 
 var handler = function (req, res) {
 	console.log("Incoming request from " + req.socket.remoteAddress);
-  if (req.url.match(/^\/distroweb\/?/)) {
+  if (req.url.match(/^\/distroweb(\/|$)/)) {
     distroReq = req.url.match(/^\/distroweb(.*)/)[1];
     distroHandler(distroReq)(res);
   }
