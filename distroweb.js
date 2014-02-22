@@ -27,16 +27,33 @@ var distroHandler = function (path) {
 
 var redirectToDistroweb = function() {
 	return function (res) {
-		res.writeHead(301,{'Location':'/distroweb'})
-		res.end()
+		res.writeHead(301,{'Location':'/distroweb'});
+		res.end();
 	}
+}
+var hackerSchoolRequest = {
+	hostname:"www.reddit.com",
+	port:80
+};
+
+
+var hsreq = function() {
+	return function (res) {
+		var hsRequest = http.request(hackerSchoolRequest, function(hsres) {
+			hsres.on('data', function(theData) {
+				res.write(theData);
+			});		
+		});
+		hsRequest.write("");
+		hsRequest.end();
+	};
 }
 
 var routes = {
 	//"/getthis": staticFileHandler("./nodeserver.js"),
 	"/": redirectToDistroweb(),
 	//"/bye": staticFileHandler("./bye.html"),
-
+	"/hackerSchool": hsreq(),
 	"/time": function(res) {
 		res.writeHead(418,{'Content-Type':'text/html'});
 		res.end(new Date().getTime().toString());
