@@ -31,6 +31,7 @@ var redirectToDistroweb = function() {
 		res.end();
 	}
 }
+
 var hackerSchoolRequest = {
 	hostname:"www.reddit.com",
 	port:80
@@ -41,7 +42,8 @@ var hsreq = function() {
 	return function (res) {
 		var hsRequest = http.request(hackerSchoolRequest, function(hsres) {
 			hsres.on('data', function(theData) {
-				res.write(theData);
+			  // regex: /(<[^<>]+\")(\/[^<>])/ becomes match[1] + hackerSchoolRequest.hostname + hsres.url + match[2]
+        res.write(theData);
 			});		
 		});
 		hsRequest.write("");
@@ -70,11 +72,14 @@ var handler = function (req, res) {
   if (req.url.match(/^\/distroweb(\/|$)/)) {
     distroReq = req.url.match(/^\/distroweb(.*)/)[1];
     distroHandler(distroReq)(res);
+    console.log("distroweb request: " + distroReq);
   }
   else if (req.url in routes) {
 		routes[req.url](res);
+    console.log("alternate route: " + req.url);
 	} else {
 		notFound(res);
+    console.log("route not found: " + req.url);
 	}
 };
 
