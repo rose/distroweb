@@ -1,17 +1,5 @@
 var http = require('http');
-var fs = require('fs');
 var net = require('net');
-
-var staticFileHandler = function(path) {
-	return function (res) {
-
-		fs.readFile(path,'utf8',function(err, fileData){
-			if (err) throw "File not found";
-			res.writeHead(418,{'Content-Type':'text/html'});
-			res.end(fileData);
-		});
-	};
-};
 
 var distroHandler = function (path) {
   // console.log("entering distroHandler");
@@ -25,25 +13,20 @@ var distroHandler = function (path) {
   };
 }
 
-var redirectToDistroweb = function() {
-	return function (res) {
-		res.writeHead(301,{'Location':'/distroweb'})
-		res.end()
-	}
-}
-
-var notFound = function(res) {
-	res.writeHead(404, {'Content-Type':"text/html"});
-	res.end("404 Not Found");
+var redirectToWeb = function(url, res) {
+  res.writeHead(301, { 'Location' : "http:/" + url}); // url already starts with a /, and yes I'm a horrible human being.
+  res.end();
 }
 
 var handler = function (req, res) {
 	console.log("Incoming request from " + req.socket.remoteAddress);
   if (req.url.match(/^\/distroweb(\/|$)/)) {
     distroReq = req.url.match(/^\/distroweb(.*)/)[1];
+    console.log("DistroWeb request: " + distroReq);
     distroHandler(distroReq)(res);
   } else {
-		notFound(res);
+    console.log("WWW request: " + req.url);
+    redirectToWeb(req.url, res);
 	}
 };
 
