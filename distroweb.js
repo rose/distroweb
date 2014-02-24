@@ -1,6 +1,6 @@
 var http = require('http');
 var fs = require('fs');
-//console.log(http);
+var net = require('net');
 
 var staticFileHandler = function(path) {
 	return function (res) {
@@ -32,17 +32,6 @@ var redirectToDistroweb = function() {
 	}
 }
 
-var routes = {
-	//"/getthis": staticFileHandler("./nodeserver.js"),
-	"/": redirectToDistroweb(),
-	//"/bye": staticFileHandler("./bye.html"),
-
-	"/time": function(res) {
-		res.writeHead(418,{'Content-Type':'text/html'});
-		res.end(new Date().getTime().toString());
-	}
-};
-
 var notFound = function(res) {
 	res.writeHead(404, {'Content-Type':"text/html"});
 	res.end("404 Not Found");
@@ -53,15 +42,12 @@ var handler = function (req, res) {
   if (req.url.match(/^\/distroweb(\/|$)/)) {
     distroReq = req.url.match(/^\/distroweb(.*)/)[1];
     distroHandler(distroReq)(res);
-  }
-  else if (req.url in routes) {
-		routes[req.url](res);
-	} else {
+  } else {
 		notFound(res);
 	}
 };
 
-http.createServer(handler).listen(80);
+http.createServer(handler).listen(1234);
 //http.createServer(function() {
 
 
