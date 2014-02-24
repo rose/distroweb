@@ -1,5 +1,6 @@
 var http = require('http');
 var fs = require('fs');
+//var json = require('json');
 var net = require('net');
 
 var tracker;
@@ -31,7 +32,7 @@ var handler = function (req, res) {
   if (req.url.match(/^\/distroweb(\/|$)/)) {
     distroReq = req.url.match(/^\/distroweb(.*)/)[1];
     console.log("DistroWeb request: " + distroReq);
-    console.log("Tracker is: " + tracker);
+    console.log("Tracker is: " + tracker.peers[0][1]);
     distroHandler(distroReq)(res);
   } else {
     console.log("WWW request: " + req.url);
@@ -40,13 +41,13 @@ var handler = function (req, res) {
 };
 
 var startup = function() {
-  fs.readFile('./tracker.dw', function (err, trackData) {
+  fs.readFile('./tracker.json', function (err, trackData) {
     if (err) {
-      console.log('tracker.dw not found!  Crashing now');
+      console.log('tracker.json not found!  Crashing now');
       throw err;
     }; 
 
-    tracker = trackData.toString();
+    tracker = JSON.parse(trackData);
     http.createServer(handler).listen(1234);
   });
 }
