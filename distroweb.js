@@ -1,5 +1,8 @@
 var http = require('http');
+var fs = require('fs');
 var net = require('net');
+
+var tracker;
 
 var distroHandler = function (path) {
   // console.log("entering distroHandler");
@@ -13,6 +16,11 @@ var distroHandler = function (path) {
   };
 }
 
+
+var getRemoteTracker = function() {
+  console.log("getRemoteTracker called");
+}
+
 var redirectToWeb = function(url, res) {
   res.writeHead(301, { 'Location' : "http:/" + url}); // url already starts with a /, and yes I'm a horrible human being.
   res.end();
@@ -23,6 +31,7 @@ var handler = function (req, res) {
   if (req.url.match(/^\/distroweb(\/|$)/)) {
     distroReq = req.url.match(/^\/distroweb(.*)/)[1];
     console.log("DistroWeb request: " + distroReq);
+    console.log("Tracker is: " + tracker);
     distroHandler(distroReq)(res);
   } else {
     console.log("WWW request: " + req.url);
@@ -30,7 +39,19 @@ var handler = function (req, res) {
 	}
 };
 
-http.createServer(handler).listen(1234);
+var startup = function() {
+  fs.readFile('./tracker.dw', function (err, trackData) {
+    if (err) {
+      console.log('tracker.dw not found!  Crashing now');
+      throw err;
+    }; 
+
+    tracker = trackData.toString();
+    http.createServer(handler).listen(1234);
+  });
+}
+
+startup();
 //http.createServer(function() {
 
 
