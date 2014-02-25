@@ -3,7 +3,12 @@ var fs = require('fs');
 //var json = require('json');
 var net = require('net');
 
+var browserPort = 1234; // will be 80 someday!
+var listenPort = 12345;
+
 var tracker;
+
+// next step: telnet in & request file by name
 
 var distroHandler = function (path) {
   // console.log("entering distroHandler");
@@ -17,7 +22,6 @@ var distroHandler = function (path) {
   };
 }
 
-
 var getRemoteTracker = function() {
   console.log("getRemoteTracker called");
 }
@@ -27,11 +31,33 @@ var redirectToWeb = function(url, res) {
   res.end();
 }
 
-var handler = function (req, res) {
+var findLatest = function(name) {
+  // will query peers for latest version
+  return { 'ip': '127.0.0.1', 'port': 12345, 'hash': '.' + name };
+}
+
+var getLatest = function(fileID, res) {
+  conn = net.createConnection({ 'host': fileID.host, 'port': fileID.port}, function() {
+    console.log("creating connection to " + fileID.host + ":" + fileID.port + " looking for file " + fileID.hash);
+    conn.write('Remote server!  Please give me ' + fileID.hash);
+  });
+
+  // ugh
+  conn.on('data', function(data) {
+    console.log("got response!");
+    distroHandler(data)(res);
+  });
+}
+
+var browserHandler = function (req, res) {
 	console.log("Incoming request from " + req.socket.remoteAddress);
   if (req.url.match(/^\/distroweb(\/|$)/)) {
     distroReq = req.url.match(/^\/distroweb(.*)/)[1];
     console.log("DistroWeb request: " + distroReq);
+    // TODO security!  check that they are not requesting .. or anything else unsavoury
+
+    fileID = findLatest(distroReq); // idObject { ip:, port:, hash: }
+    getLatest(fileID, res);
     console.log("Tracker is: " + tracker.peers[0][1]);
     distroHandler(distroReq)(res);
   } else {
@@ -39,6 +65,18 @@ var handler = function (req, res) {
     redirectToWeb(req.url, res);
 	}
 };
+
+var inHandler = function(conn) {
+  conn.on('end', function() {
+    console.log("file downloaded, woohoo!");
+  });
+  conn.on('data', function(data) {
+    console.log(data + "  (from " + conn.remoteAddress + ")");
+  });
+  //fs.readFile('./' + id.hash, function (err, dataRequested) {
+    //return dataR
+  //});
+}
 
 var startup = function() {
   fs.readFile('./tracker.json', function (err, trackData) {
@@ -48,12 +86,11 @@ var startup = function() {
     }; 
 
     tracker = JSON.parse(trackData);
-    http.createServer(handler).listen(1234);
+
+    console.log('tracker read, spinning up http server');
+    http.createServer(browserHandler).listen(browserPort);
+    net.createServer(inHandler).listen(listenPort);
   });
 }
 
 startup();
-//http.createServer(function() {
-
-
-//	}).listen(4000);
