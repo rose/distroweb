@@ -7,18 +7,20 @@ var browserPort = 1234; // will be 80 someday!
 var listenPort = 12345;
 
 var tracker;
+var requestHeader = "get ";
 
 // next step: telnet in & request file by name
 
-var distroHandler = function (path) {
+var distroHandler = function (response) {
   // console.log("entering distroHandler");
-  if (path.match(/^\//)) {
-  	path = path.substr(1)
-  }
+  split = response.toString().match(/(.{3})(.*)/);
+  code = split[1];
+  page = split[2];
+
   return function (res) {
     // console.log("entering callback");
-    res.writeHead(418, {'Content-Type':'text/html'});
-    res.end("hello " + path);
+    res.writeHead(code, {'Content-Type':'text/html'});
+    res.end(page);
   };
 }
 
@@ -37,9 +39,9 @@ var findLatest = function(name) {
 }
 
 var getLatest = function(fileID, res) {
-  conn = net.createConnection({ 'host': fileID.host, 'port': fileID.port}, function() {
-    console.log("creating connection to " + fileID.host + ":" + fileID.port + " looking for file " + fileID.hash);
-    conn.write('Remote server!  Please give me ' + fileID.hash);
+  conn = net.createConnection({ 'host': fileID.ip, 'port': fileID.port}, function() {
+    console.log("creating connection to " + fileID.ip + ":" + fileID.port + " looking for file " + fileID.hash);
+    conn.write(requestHeader + fileID.hash);
   });
 
   // ugh
@@ -59,7 +61,6 @@ var browserHandler = function (req, res) {
     fileID = findLatest(distroReq); // idObject { ip:, port:, hash: }
     getLatest(fileID, res);
     console.log("Tracker is: " + tracker.peers[0][1]);
-    distroHandler(distroReq)(res);
   } else {
     console.log("WWW request: " + req.url);
     redirectToWeb(req.url, res);
@@ -71,8 +72,21 @@ var inHandler = function(conn) {
     console.log("file downloaded, woohoo!");
   });
   conn.on('data', function(data) {
+    // parse the header
+    filePath = data.toString().match(/get (.*)/)[1];
+    // validation should be here
+    fs.readFile(filePath, function(err, content) {
+      if (err) {
+        console.log('GAAAH!  NO FILE');
+        conn.write("404404 not found");
+      } else {
+        conn.write("200" + content);
+      };
+    });
+
     console.log(data + "  (from " + conn.remoteAddress + ")");
   });
+
   //fs.readFile('./' + id.hash, function (err, dataRequested) {
     //return dataR
   //});
