@@ -24,7 +24,7 @@ var distroHandler = function (response) {
     // console.log("entering callback");
      res.writeHead(code, {'Content-Type':'text/plain'});
     //console.log(page);
-    res.write(page);
+    while (!res.write(page));
     res.end();
   };
 }
@@ -86,7 +86,7 @@ var inHandler = function(conn) {
         console.log('GAAAH!  NO FILE');
         conn.write("404404 not found");
       } else {
-        console.log(content.toString());
+        // console.log(content.toString());
         console.log(conn.write("200" + content.toString()));
       };
     });
