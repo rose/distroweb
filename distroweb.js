@@ -13,14 +13,19 @@ var requestHeader = "get ";
 
 var distroHandler = function (response) {
   // console.log("entering distroHandler");
-  split = response.toString().match(/(.{3})(.*)/);
-  code = split[1];
-  page = split[2];
+  //split = response.toString().match(/(.{3})(.*)/);
+  //code = split[1];
+  //page = split[2];
+  str = response.toString();
+  code = str.substr(0,3);
+  page = str.substr(3);
 
   return function (res) {
     // console.log("entering callback");
-    res.writeHead(code, {'Content-Type':'text/html'});
-    res.end(page);
+     res.writeHead(code, {'Content-Type':'text/plain'});
+    //console.log(page);
+    res.write(page);
+    res.end();
   };
 }
 
@@ -71,6 +76,7 @@ var inHandler = function(conn) {
   conn.on('end', function() {
     console.log("file downloaded, woohoo!");
   });
+
   conn.on('data', function(data) {
     // parse the header
     filePath = data.toString().match(/get (.*)/)[1];
@@ -80,7 +86,8 @@ var inHandler = function(conn) {
         console.log('GAAAH!  NO FILE');
         conn.write("404404 not found");
       } else {
-        conn.write("200" + content);
+        console.log(content.toString());
+        console.log(conn.write("200" + content.toString()));
       };
     });
 
