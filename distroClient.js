@@ -12,31 +12,21 @@ var getLatest = function(request, res) {
     console.log("creating connection to " + fileID.ip + ":" + fileID.port + " looking for file " + fileID.hash);
     conn.write(requestHeader + fileID.hash);
   });
-
+  data = '';
   // ugh
-  conn.on('data', function(data) {
+  conn.on('data', function(chunk) {
     console.log("got response!");
-    distroHandler(data)(res);
+    data = data + chunk.toString();
+  });
+  conn.on('end', function(){
+    code = data.substr(0,3);
+    page = data.substr(3);
+    res.writeHead(code, {'Content-Type':'text/html'});
+    res.write(page);
+    res.end();
   });
 }
 
-var distroHandler = function (response) {
-  // console.log("entering distroHandler");
-  //split = response.toString().match(/(.{3})(.*)/);
-  //code = split[1];
-  //page = split[2];
-  str = response.toString();
-  code = str.substr(0,3);
-  page = str.substr(3);
-
-  return function (res) {
-    // console.log("entering callback");
-     res.writeHead(code, {'Content-Type':'text/plain'});
-    //console.log(page);
-    while (!res.write(page));
-    res.end();
-  };
-}
 
 
 exports.getLatest = getLatest;

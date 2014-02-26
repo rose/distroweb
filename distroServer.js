@@ -19,6 +19,7 @@ var inHandler = function(conn) {
       } else {
         // console.log(content.toString());
         console.log(conn.write("200" + content.toString()));
+        conn.end();
       };
     });
 
