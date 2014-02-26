@@ -1,8 +1,9 @@
 var net = require('net');
+var requestHeader = "get ";
 
 var findLatest = function(name) {
   // will query peers for latest version
-  return { 'ip': '10.0.3.125', 'port': 12345, 'hash': '.' + name };
+  return { 'ip': '127.0.0.1', 'port': 12345, 'hash': '.' + name };
 }
 
 var getLatest = function(request, res) {

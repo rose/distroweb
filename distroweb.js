@@ -1,5 +1,5 @@
-
 var fs = require('fs');
+
 //var json = require('json');
 
 var distroProxy = require('./distroProxy');
@@ -7,7 +7,6 @@ var distroServer = require('./distroServer');
 
 
 var tracker;
-var requestHeader = "get ";
 
 // next step: telnet in & request file by name
 
