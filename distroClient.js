@@ -1,24 +1,30 @@
 var net = require('net');
+var router = require('./distroRouter.js');
 var requestHeader = "get ";
 
-var findLatest = function(name) {
+var findLatest = function(hash) {
   // will query peers for latest version
-  return { 'ip': '127.0.0.1', 'port': 12345, 'hash': '.' + name };
+
+  latestHash = hash; // latest hash 
+
+  return router.find(latestHash); // list sorted by priority
   
 }
 
-var getLatest = function(request, res) {
-  fileID = findLatest(request);
+var getLatest = function(hash, res) {
+  fileID = findLatest(hash)[0];
   conn = net.createConnection({ 'host': fileID.ip, 'port': fileID.port}, function() {
-    console.log("creating connection to " + fileID.ip + ":" + fileID.port + " looking for file " + fileID.hash);
-    conn.write(requestHeader + fileID.hash);
+    console.log("creating connection to " + fileID.ip + ":" + fileID.port + " looking for file " + hash);
+    conn.write(requestHeader + '.' + hash);
   });
+
   data = '';
-  // ugh
+
   conn.on('data', function(chunk) {
     console.log("got response!");
     data = data + chunk.toString();
   });
+
   conn.on('end', function(){
     code = data.substr(0,3);
     page = data.substr(3);
