@@ -1,11 +1,11 @@
 [
-  { "ip": "localhost",
+  { "ip": "10.0.3.125",
     "port": 54321,
     "key": "ff00ff" },
-  { "ip": "10.0.3.98",
+  { "ip": "localhost",
     "port": 54321,
     "key": "ffff00" },
-  { "ip": "10.0.3.98",
+  { "ip": "8.8.8.8",
     "port": 54321,
     "key": "ffffff" }
 ]
