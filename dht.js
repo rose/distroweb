@@ -51,9 +51,9 @@ var sendOut = function(request, remoteAddress) {
 
 
 var sendBack = function(response) {
-  console.log("DHT:  Sending response " + JSON.stringify(response));
+  console.log("DHT:  Sending response " + JSON.stringify(response) + " TTL: " + response.ips.length );
 
-  if (response.ips === []) {
+  if (!response.ips.length) {
     // passdht(response.data)
     console.log("DHT:  Received dht file! " + response.data);
     return 0;
