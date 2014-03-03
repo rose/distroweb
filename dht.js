@@ -10,22 +10,28 @@ var dhtHandler = function(conn) {
   req = '';
 
   conn.on('data', function(chunk) { 
-    console.log("dht:  Received request chunk from " + conn.remoteAddress);
+    console.log("DHT:  Received request chunk " + chunk + " from " + conn.remoteAddress);
     req += chunk;
   });
 
+  conn.on('err', function(err) {
+    console.log(JSON.stringify(err));
+  });
+
   conn.on('end', function() {
-    console.log("dht:  Track request received, looking for next hop...");
+    console.log("DHT:  Track request received, looking for next hop...");
 
     // TODO this will be a JSON document with field for whether we are
     // looking for a dht or passing one back
     parseAndRoute(req, conn.remoteAddress);
-    console.log("dht:  Done handling request, closing connection.");
+    console.log("DHT:  Done handling request, closing connection.");
   });
 }
 
 
 var parseAndRoute = function(incomingRequest, remoteAddress) {
+  console.log("DHT:  Parsing " + incomingRequest);
+
   requestObject = JSON.parse(incomingRequest);
   if (requestObject.outbound) {
     sendOut(requestObject, remoteAddress);
@@ -36,6 +42,8 @@ var parseAndRoute = function(incomingRequest, remoteAddress) {
 
 
 var sendOut = function(request, remoteAddress) {
+  console.log("DHT:  Sending request " + JSON.stringify(request));
+
   request = addSelf(request, remoteAddress);
   peers = util.sortPeers(request.hash);
   checkNextPeer(peers, request, 0);
@@ -43,9 +51,11 @@ var sendOut = function(request, remoteAddress) {
 
 
 var sendBack = function(response) {
+  console.log("DHT:  Sending response " + JSON.stringify(response));
+
   if (response.ips === []) {
     // passdht(response.data)
-    console.log("dht:  Received dht file! " + response.data);
+    console.log("DHT:  Received dht file! " + response.data);
     return 0;
   }
 
@@ -59,7 +69,7 @@ var sendBack = function(response) {
 
 
 var addSelf = function(requestObject, remoteAddress) {
-  console.log("dht:  Adding self to request object");
+  console.log("DHT:  Adding self to request object");
 
   requestObject.ips.push(remoteAddress);
   requestObject.ports.push(dhtPort);
@@ -75,11 +85,11 @@ var addSelf = function(requestObject, remoteAddress) {
 
 var checkNextPeer = function(peers, request, nextPeer) {
   next = peers[nextPeer];
-  console.log("dht:  Checking peer " + nextPeer + ": " + next);
+  console.log("DHT:  Checking peer " + nextPeer + ": " + next);
 
   if (next.ip === 'localhost') {
-    console.log("dht:  I am the closest to hash " + request.hash + "!");
-    console.log("dht:  BOW DOWN BEFORE ME PEASANTS");
+    console.log("DHT:  I am the closest to hash " + request.hash + "!");
+    console.log("DHT:  BOW DOWN BEFORE ME PEASANTS");
     request.ports.pop();
     request.outbound = false;
     request.data = tracker.execute(request.hash, request.message);
@@ -92,7 +102,7 @@ var checkNextPeer = function(peers, request, nextPeer) {
 
 
 var tryConnecting = function(peer, request, peerIndex) {
-  console.log("dht:  Passing on request to " 
+  console.log("DHT:  Passing on request to " 
       + peer.key + " at " + peer.ip + ":" + peer.port);
 
   conn = net.createConnection(peer.port, peer.ip, function() {
@@ -124,7 +134,7 @@ var tryConnecting = function(peer, request, peerIndex) {
 
 var startup = function() {
   net.createServer({'allowHalfOpen': true}, dhtHandler).listen(dhtPort);
-  console.log("dht:  Listening on port " + dhtPort);
+  console.log("DHT:  Listening on port " + dhtPort);
 }
 
 

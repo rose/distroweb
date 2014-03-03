@@ -41,7 +41,8 @@ var makeTrackRequest = function(hash, message) {
     'ports': [54321],
     'ips': [],
     'outbound': true,
-    'hash': hash
+    'hash': hash,
+    'data': ''
   };
   return request;
 }
