@@ -100,11 +100,11 @@ var tryConnecting = function(peer, request, peerIndex) {
     conn.setTimeout(2000, function() {
       checkNextPeer(peers, request, peerIndex + 1);
       // close connection, or replace checkNextPeer with thrown error
-      conn.close();
+      conn.end();
     });
 
     conn.write(JSON.stringify(request));
-    conn.close();
+    conn.end();
   });
 
   conn.on('err', function() {
