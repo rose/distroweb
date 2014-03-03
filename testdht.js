@@ -5,7 +5,7 @@ dht.startup();
 console.log("********************");
 console.log("TESTING:  get FFFF00");
 console.log("********************");
-dht.get('c0ffee', console.log);
+dht.get('c0ffea', console.log);
 
 // console.log("********************");
 // console.log("TESTING:  get FF00FF");

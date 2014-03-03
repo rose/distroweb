@@ -10,16 +10,17 @@ var execute = function (hash, message) {
 
 
 var readTracker = function (hash) {
-  fs.readFile('./source/' + hash, function(err, content) {
-    if (err) {
-      console.log("Tracker:  " + hash + " not found, returning empty string");
-      return "";
-    } else {
-      console.log("Tracker:  " + hash + " found"); 
-      return content;
-    }
-  });
+  try {
+    content = fs.readFileSync('./source/' + hash);
+  } catch (err) {
+    console.log("Tracker:  " + hash + " not found, returning empty string");
+    return "";
+  }
+
+  console.log("Tracker:  " + hash + " found"); 
+  return content;
 }
+
 
 
 exports.execute = execute;
