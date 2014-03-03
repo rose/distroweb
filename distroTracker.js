@@ -11,7 +11,7 @@ var execute = function (hash, message) {
 
 var readTracker = function (hash) {
   try {
-    content = fs.readFileSync('./source/' + hash);
+    content = fs.readFileSync('./source/' + hash).toString();
   } catch (err) {
     console.log("Tracker:  " + hash + " not found, returning empty string");
     return "";
