@@ -9,11 +9,13 @@ var hashLen = 6;
 var dhtHandler = function(conn) {
   req = '';
 
+  conn.write("distro");
+  
   conn.on('data', function(chunk) { 
     console.log("DHT:  Received request chunk " + chunk + " from " + conn.remoteAddress);
     req += chunk;
   });
-
+  
   conn.on('err', function(err) {
     console.log(JSON.stringify(err));
   });
@@ -159,9 +161,6 @@ var tryConnecting = function(peer, request, peerIndex) {
 
 var startup = function() {
   dhtServer = net.createServer({'allowHalfOpen': true}, dhtHandler).listen(dhtPort);
-  dhtServer.on('connection', function(conn) {
-    conn.write("distro");
-  });
   console.log("DHT:  Listening on port " + dhtPort);
 }
 
