@@ -14,6 +14,12 @@ var dhtHandler = function(conn) {
   conn.on('data', function(chunk) { 
     console.log("DHT:  Received request chunk " + chunk + " from " + conn.remoteAddress);
     req += chunk;
+    if (req.match(/.*distro$/)) {
+      req = req.substr(0,req.length-6);     
+      parseAndRoute(req,conn.remoteAddress);
+      conn.end();
+    }
+
   });
   
   conn.on('err', function(err) {
@@ -21,11 +27,11 @@ var dhtHandler = function(conn) {
   });
 
   conn.on('end', function() {
-    console.log("DHT:  Track request received, looking for next hop...");
+    // console.log("DHT:  Track request received, looking for next hop...");
 
     // TODO this will be a JSON document with field for whether we are
     // looking for a dht or passing one back
-    parseAndRoute(req, conn.remoteAddress);
+    // parseAndRoute(req, conn.remoteAddress);
   });
 }
 
@@ -109,7 +115,7 @@ var tryConnecting = function(peer, request, peerIndex) {
   var conn = net.createConnection(peer.port, peer.ip, function() {
     console.log("DHT:  Created connection to " 
       + peer.key + " at " + peer.ip + ":" + peer.port);
-    conn.write(JSON.stringify(request));
+    conn.write(JSON.stringify(request) + "distro");
   });
 
   conn.setTimeout(5000);
