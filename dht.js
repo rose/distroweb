@@ -112,23 +112,37 @@ var tryConnecting = function(peer, request, peerIndex) {
 
   conn.setTimeout(10000);
 
-  /*conn.on('data', function(chunk) {
-    if (chunk != peer.key) {
-      console.log("DHT:  Invalid response from peer, trying next");
-      checkNextPeer(peers, request, peerIndex + 1);
-    }
-  });*/
+  var triedNext = false;
+
+  /* handshake later?
+
+     conn.on('data', function(chunk) {
+     if (chunk != peer.key) {
+     console.log("DHT:  Invalid response from peer, trying next");
+     checkNextPeer(peers, request, peerIndex + 1);
+     }
+     });
+  */
 
   conn.on('timeout', function() {
     console.log("DHT:  TIMEOUT!!!");
-    checkNextPeer(peers, request, peerIndex + 1);
-    // close connection, or replace checkNextPeer with thrown error
-    conn.end();
+
+    if (!triedNext) {
+      checkNextPeer(peers, request, peerIndex + 1);
+      conn.end();
+    }
+
+    triedNext = true;
   });
 
   conn.on('error', function(err) {
     console.log("DHT:  ERROR!!! " + err.toString());
-    checkNextPeer(peers, request, peerIndex + 1);
+
+    if (!triedNext) {
+      checkNextPeer(peers, request, peerIndex + 1);
+    }
+
+    triedNext = true;
   });
 }
 
