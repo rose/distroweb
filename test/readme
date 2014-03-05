@@ -22,11 +22,11 @@ To run the test:
 
 4)  in the distroweb folder of each computer, create a symlink called peers that points to the appropriate test Peers file
 
-5)  on the wantsTracker computer, ln -s test/dhtTestTracker source/ff0002
+5)  on the wantsTracker computer, ln -s test/dhtTestTracker trackers/2000ff
 
 6)  run the DHT server (node test/dhtServer.js) on all the computers
 
-7)  run test/dhtRequest.js on the hasTrackerination computer
+7)  run test/dhtRequest.js on the hasTracker computer
 
 8)  if it didn't work, please email us with the details.  If it did, GROVEL BEFORE OUR MIGHTY DHT, PEASANT
 
