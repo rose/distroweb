@@ -4,7 +4,7 @@ var tracker = require('./distroTracker');
 var util = require('./utils');
 
 var dhtPort = 54321;
-
+var hashLen = 6;
 
 var dhtHandler = function(conn) {
   req = '';
@@ -110,39 +110,40 @@ var tryConnecting = function(peer, request, peerIndex) {
     conn.write(JSON.stringify(request));
   });
 
-  conn.setTimeout(10000);
+  conn.setTimeout(5000);
 
-  var triedNext = false;
+  var tryNextPeer = true;
 
-  /* handshake later?
+  var response = ""
 
-     conn.on('data', function(chunk) {
-     if (chunk != peer.key) {
-     console.log("DHT:  Invalid response from peer, trying next");
-     checkNextPeer(peers, request, peerIndex + 1);
-     }
-     });
-  */
+  conn.on('data', function(chunk) {
+    response += chunk;
+    if (response.substr(0,hashLen) == "distro") {
+      console.log("DHT:  Valid response from peer, will not try next");
+      tryNextPeer = false;
+    }
+  });
+  
 
   conn.on('timeout', function() {
     console.log("DHT:  TIMEOUT!!!");
 
-    if (!triedNext) {
+    if (tryNextPeer) {
       checkNextPeer(peers, request, peerIndex + 1);
       conn.end();
     }
 
-    triedNext = true;
+    tryNextPeer = false;
   });
 
   conn.on('error', function(err) {
     console.log("DHT:  ERROR!!! " + err.toString());
 
-    if (!triedNext) {
+    if (tryNextPeer) {
       checkNextPeer(peers, request, peerIndex + 1);
     }
 
-    triedNext = true;
+    tryNextPeer = false;
   });
 }
 
@@ -157,7 +158,10 @@ var tryConnecting = function(peer, request, peerIndex) {
 
 
 var startup = function() {
-  net.createServer({'allowHalfOpen': true}, dhtHandler).listen(dhtPort);
+  dhtServer = net.createServer({'allowHalfOpen': true}, dhtHandler).listen(dhtPort);
+  dhtServer.on('connection', function(conn) {
+    conn.write("distro");
+  });
   console.log("DHT:  Listening on port " + dhtPort);
 }
 
