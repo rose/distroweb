@@ -24,7 +24,6 @@ var dhtHandler = function(conn) {
     // TODO this will be a JSON document with field for whether we are
     // looking for a dht or passing one back
     parseAndRoute(req, conn.remoteAddress);
-    console.log("DHT:  Done handling request, closing connection.");
   });
 }
 
@@ -85,7 +84,7 @@ var addSelf = function(requestObject, remoteAddress) {
 
 var checkNextPeer = function(peers, request, nextPeer) {
   next = peers[nextPeer];
-  console.log("DHT:  Checking peer " + nextPeer + ": " + next);
+  console.log("DHT:  Checking peer " + nextPeer + ": " + next.id + " at " + next.ip);
 
   if (next.ip === 'localhost') {
     console.log("DHT:  I am the closest to hash " + request.hash + "!");
@@ -105,19 +104,30 @@ var tryConnecting = function(peer, request, peerIndex) {
   console.log("DHT:  Passing on request to " 
       + peer.key + " at " + peer.ip + ":" + peer.port);
 
-  conn = net.createConnection(peer.port, peer.ip, function() {
-
-    conn.setTimeout(2000, function() {
-      checkNextPeer(peers, request, peerIndex + 1);
-      // close connection, or replace checkNextPeer with thrown error
-      conn.end();
-    });
-
+  var conn = net.createConnection(peer.port, peer.ip, function() {
+    console.log("DHT:  Created connection to " 
+      + peer.key + " at " + peer.ip + ":" + peer.port);
     conn.write(JSON.stringify(request));
+  });
+
+  conn.setTimeout(10000);
+
+  /*conn.on('data', function(chunk) {
+    if (chunk != peer.key) {
+      console.log("DHT:  Invalid response from peer, trying next");
+      checkNextPeer(peers, request, peerIndex + 1);
+    }
+  });*/
+
+  conn.on('timeout', function() {
+    console.log("DHT:  TIMEOUT!!!");
+    checkNextPeer(peers, request, peerIndex + 1);
+    // close connection, or replace checkNextPeer with thrown error
     conn.end();
   });
 
-  conn.on('err', function() {
+  conn.on('error', function(err) {
+    console.log("DHT:  ERROR!!! " + err.toString());
     checkNextPeer(peers, request, peerIndex + 1);
   });
 }
