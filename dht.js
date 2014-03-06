@@ -14,6 +14,7 @@ var dhtHandler = function(conn) {
     console.log("DHT:  Received request chunk " + chunk + " from " + conn.remoteAddress);
     req += chunk;
     if (req.match(/.*circus$/)) {
+      console.log("Circus found!");
       req = req.substr(0,req.length-6);     
       parseAndRoute(req,conn.remoteAddress);
       conn.end();

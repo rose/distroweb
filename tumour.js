@@ -25,6 +25,7 @@ var tryConnecting = function(peer, request, peerIndex) {
     response += chunk;
     if (response.substr(0,hashLen) == "flying") {
       console.log("Tumour:  Valid response from peer, will not try next");
+      console.log("Tumour:  Received " + response);
       tryNextPeer = false;
     }
   });
