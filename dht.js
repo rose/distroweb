@@ -4,8 +4,6 @@ var tracker = require('./distroTracker');
 var util = require('./utils');
 var tumour = require('./tumour');
 
-var dhtPort = 54321;
-var hashLen = 6;
 
 var dhtHandler = function(conn) {
   req = '';
@@ -80,14 +78,14 @@ var addSelf = function(requestObject, remoteAddress) {
   console.log("DHT:  Adding self to request object");
 
   requestObject.ips.push(remoteAddress);
-  requestObject.ports.push(dhtPort);
+  requestObject.ports.push(util.dhtPort);
   return requestObject;
 }
 
 
 var startup = function() {
-  dhtServer = net.createServer({'allowHalfOpen': true}, dhtHandler).listen(dhtPort);
-  console.log("DHT:  Listening on port " + dhtPort);
+  dhtServer = net.createServer({'allowHalfOpen': true}, dhtHandler).listen(util.dhtPort);
+  console.log("DHT:  Listening on port " + util.dhtPort);
 }
 
 
@@ -99,8 +97,8 @@ var get = function(hash, callback) {
 var update = function(hash, message, callback) {
   console.log("DHT:  Received get request for " + hash);
 
-  var conn = net.createConnection(dhtPort, 'localhost', function() {
-    console.log("DHT:  Connecting to localhost:" + dhtPort);
+  var conn = net.createConnection(util.dhtPort, 'localhost', function() {
+    console.log("DHT:  Connecting to localhost:" + util.dhtPort);
     request = util.makeTrackRequest(hash, message);
     conn.write(JSON.stringify(request) + "distro");
     conn.end();

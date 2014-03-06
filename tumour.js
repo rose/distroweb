@@ -1,5 +1,8 @@
 var net = require('net');
 var tracker = require('./distroTracker');
+var util = require('./utils');
+
+var hashLen = 6;
 
 
 var tryConnecting = function(peer, request, peerIndex) {
@@ -65,7 +68,10 @@ var checkNextPeer = function(peers, request, nextPeer) {
     request.ports.pop();
     request.outbound = false;
     request.data = tracker.execute(request.hash, request.message);
-    sendBack(request);
+    net.createConnection(util.dhtPort, 'localhost', function() {
+      conn.write(JSON.stringify(request) + "distro");
+      conn.end();
+    });
     return 0;
   }
 

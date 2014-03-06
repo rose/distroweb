@@ -1,4 +1,5 @@
 fs = require('fs');
+var dhtPort = 54321;
 
 var makeHammingTable = function() {
   var foo = '0123456789abcdef';
@@ -60,3 +61,4 @@ hammingTable = makeHammingTable();
 
 exports.sortPeers = sortPeers;
 exports.makeTrackRequest = makeTrackRequest;
+exports.dhtPort = dhtPort;
