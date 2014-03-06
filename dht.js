@@ -64,10 +64,10 @@ var sendBack = function(response) {
     // passdht(response.data)
     console.log("DHT:  Received dht file! " + response.data);
   } else {
-      var conn = net.createConnection(response.ports.pop(), response.ips.pop(), function() {
+    var conn = net.createConnection(response.ports.pop(), response.ips.pop(), function() {
       conn.write(JSON.stringify(response) + "circus");
       conn.end();
-    }
+    });
   }
   // TODO: maybe hop over broken connections on the way back?
 }
