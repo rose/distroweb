@@ -102,7 +102,7 @@ var update = function(hash, message, callback) {
   var conn = net.createConnection(dhtPort, 'localhost', function() {
     console.log("DHT:  Connecting to localhost:" + dhtPort);
     request = util.makeTrackRequest(hash, message);
-    conn.write(JSON.stringify(request));
+    conn.write(JSON.stringify(request) + "distro");
     conn.end();
   });
 
