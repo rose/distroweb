@@ -12,7 +12,7 @@ var inHandler = function(conn) {
   conn.on('data', function(data) { // assuming request will be a single chunk
     console.log("Server:  Received " + data + " request from " + conn.remoteAddress); 
     filePath = getPath(data);
-    serveFile (filePath, conn);
+    serveFile(filePath, conn);
   });
 }
 
@@ -30,7 +30,7 @@ var serveFile = function(path, conn) {
   });
 }
 
-var getPath = function() {
+var getPath = function(data) {
   // todo header should not be hardcoded.  Use json or assume all requests are get?
   return "./content/" + data.toString().match(/get (.*)/)[1];
   // todo security - ensure that they are only requesting a file we want to serve
