@@ -32,7 +32,7 @@ var serveFile = function(path, conn) {
 
 var getPath = function() {
   // todo header should not be hardcoded.  Use json or assume all requests are get?
-  return data.toString().match(/get (.*)/)[1];
+  return "./content/" + data.toString().match(/get (.*)/)[1];
   // todo security - ensure that they are only requesting a file we want to serve
 }
 

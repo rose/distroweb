@@ -1,9 +1,8 @@
 var net = require('net');
-var tracker = require('./distroTracker');
 var requestHeader = "get ";
 
 
-var getFile = function(peers, res) {
+var getFile = function(peers, res, hash) {
   data = '';
 
   fileID = peers[0];
