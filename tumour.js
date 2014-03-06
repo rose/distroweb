@@ -68,7 +68,7 @@ var checkNextPeer = function(peers, request, nextPeer) {
     request.ports.pop();
     request.outbound = false;
     request.data = tracker.execute(request.hash, request.message);
-    net.createConnection(util.dhtPort, 'localhost', function() {
+    var conn = net.createConnection(util.dhtPort, 'localhost', function() {
       conn.write(JSON.stringify(request) + "distro");
       conn.end();
     });
