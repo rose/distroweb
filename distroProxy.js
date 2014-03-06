@@ -11,7 +11,7 @@ var browserHandler = function (req, res) {
     console.log("Proxy:  DistroWeb request: " + distroReq);
     //util.makeTrackRequest(distroReq.substr(1));
     dht.get(distroReq.substr(1), function(returnedPage) {
-      res.writeHead(200, { "Content-Type: text/html"});
+      res.writeHead(200, { "Content-Type":"text/html"});
       res.write(returnedPage);
       res.end();
     });
