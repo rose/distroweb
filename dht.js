@@ -43,7 +43,7 @@ var parseAndRoute = function(incomingRequest, conn) {
   if (requestObject.outbound) {
     sendOut(requestObject, conn.remoteAddress);
   } else {
-    sendBack(requestObject, conn);
+    sendBack(requestObject);
   }
 }
 
@@ -57,18 +57,18 @@ var sendOut = function(request, remoteAddress) {
 }
 
 
-var sendBack = function(response, conn) {
+var sendBack = function(response) {
   console.log("DHT:  Sending response " + JSON.stringify(response) + " TTL: " + response.ips.length );
-
+  
   if (!response.ips.length) {
     // passdht(response.data)
     console.log("DHT:  Received dht file! " + response.data);
-    conn.end();
+  } else {
+      var conn = net.createConnection(response.ports.pop(), response.ips.pop(), function() {
+      conn.write(JSON.stringify(response) + "circus");
+      conn.end();
+    }
   }
-
-  conn.write(JSON.stringify(response) + "circus");
-  conn.end();
- 
   // TODO: maybe hop over broken connections on the way back?
 }
 
