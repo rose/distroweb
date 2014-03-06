@@ -16,7 +16,7 @@ var dhtHandler = function(conn) {
     if (req.match(/.*circus$/)) {
       console.log("Circus found!");
       req = req.substr(0,req.length-6);     
-      parseAndRoute(req,conn.remoteAddress);
+      parseAndRoute(req,conn);
       conn.end();
     }
 
@@ -36,14 +36,14 @@ var dhtHandler = function(conn) {
 }
 
 
-var parseAndRoute = function(incomingRequest, remoteAddress) {
+var parseAndRoute = function(incomingRequest, conn) {
   console.log("DHT:  Parsing " + incomingRequest);
 
   requestObject = JSON.parse(incomingRequest);
   if (requestObject.outbound) {
-    sendOut(requestObject, remoteAddress);
+    sendOut(requestObject, conn.remoteAddress);
   } else {
-    sendBack(requestObject);
+    sendBack(requestObject, conn);
   }
 }
 
@@ -57,19 +57,17 @@ var sendOut = function(request, remoteAddress) {
 }
 
 
-var sendBack = function(response) {
+var sendBack = function(response, conn) {
   console.log("DHT:  Sending response " + JSON.stringify(response) + " TTL: " + response.ips.length );
 
   if (!response.ips.length) {
     // passdht(response.data)
     console.log("DHT:  Received dht file! " + response.data);
-    return 0;
+    conn.end();
   }
 
-  var conn = net.createConnection(response.ports.pop(), response.ips.pop(), function() {
-    conn.write(JSON.stringify(response));
-    conn.end();
-  });
+  conn.write(JSON.stringify(response));
+  conn.end();
  
   // TODO: maybe hop over broken connections on the way back?
 }

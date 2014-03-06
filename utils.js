@@ -39,7 +39,7 @@ var sortPeers = function (hash) {
 var makeTrackRequest = function(hash, message) {
   request = {
     'message': message,
-    'ports': [54321],
+    'ports': [dhtPort],
     'ips': [],
     'outbound': true,
     'hash': hash,
