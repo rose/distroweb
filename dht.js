@@ -8,12 +8,12 @@ var tumour = require('./tumour');
 var dhtHandler = function(conn) {
   req = '';
 
-  conn.write("distro");
+  conn.write("flying");
   
   conn.on('data', function(chunk) { 
     console.log("DHT:  Received request chunk " + chunk + " from " + conn.remoteAddress);
     req += chunk;
-    if (req.match(/.*distro$/)) {
+    if (req.match(/.*circus$/)) {
       req = req.substr(0,req.length-6);     
       parseAndRoute(req,conn.remoteAddress);
       conn.end();
@@ -100,8 +100,7 @@ var update = function(hash, message, callback) {
   var conn = net.createConnection(util.dhtPort, 'localhost', function() {
     console.log("DHT:  Connecting to localhost:" + util.dhtPort);
     request = util.makeTrackRequest(hash, message);
-    conn.write(JSON.stringify(request) + "distro");
-    conn.end();
+    conn.write(JSON.stringify(request) + "circus");
   });
 
   response = '';

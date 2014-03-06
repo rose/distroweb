@@ -12,7 +12,7 @@ var tryConnecting = function(peer, request, peerIndex) {
   var conn = net.createConnection(peer.port, peer.ip, function() {
     console.log("Tumour:  Created connection to " 
       + peer.key + " at " + peer.ip + ":" + peer.port);
-    conn.write(JSON.stringify(request) + "distro");
+    conn.write(JSON.stringify(request) + "circus");
   });
 
   conn.setTimeout(5000);
@@ -23,7 +23,7 @@ var tryConnecting = function(peer, request, peerIndex) {
 
   conn.on('data', function(chunk) {
     response += chunk;
-    if (response.substr(0,hashLen) == "distro") {
+    if (response.substr(0,hashLen) == "flying") {
       console.log("Tumour:  Valid response from peer, will not try next");
       tryNextPeer = false;
     }
@@ -69,7 +69,7 @@ var checkNextPeer = function(peers, request, nextPeer) {
     request.outbound = false;
     request.data = tracker.execute(request.hash, request.message);
     var conn = net.createConnection(util.dhtPort, 'localhost', function() {
-      conn.write(JSON.stringify(request) + "distro");
+      conn.write(JSON.stringify(request) + "circus");
       conn.end();
     });
     return 0;
