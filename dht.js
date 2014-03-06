@@ -7,7 +7,7 @@ var tumour = require('./tumour');
 
 var dhtHandler = function(conn) {
   req = '';
-
+  
   conn.write("flying");
   
   conn.on('data', function(chunk) { 
@@ -66,7 +66,7 @@ var sendBack = function(response, conn) {
     conn.end();
   }
 
-  conn.write(JSON.stringify(response));
+  conn.write(JSON.stringify(response) + "circus");
   conn.end();
  
   // TODO: maybe hop over broken connections on the way back?
