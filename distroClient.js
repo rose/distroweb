@@ -8,7 +8,7 @@ var getFile = function(peers, res, hash) {
   fileID = peers[0];
   conn = net.createConnection({ 'host': fileID.ip, 'port': fileID.port}, function() {
     console.log("creating connection to " + fileID.ip + ":" + fileID.port + " looking for file " + hash);
-    conn.write(requestHeader + '.' + hash);
+    conn.write(requestHeader + hash);
   });
 
   conn.on('data', function(chunk) {

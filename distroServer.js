@@ -20,7 +20,7 @@ var serveFile = function(path, conn) {
   // todo hardcoded headers make baby jesus cry
   fs.readFile(path, function(err, content) {
     if (err) {
-      console.log('Server:  Unable to read ' + filePath);
+      console.log('Server:  Unable to read ' + path);
       conn.write("404404 not found");
     } else {
       conn.write("200" + content.toString());
