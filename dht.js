@@ -2,6 +2,7 @@ var net = require('net');
 
 var tracker = require('./distroTracker');
 var util = require('./utils');
+var tumour = require('./tumour');
 
 var dhtPort = 54321;
 var hashLen = 6;
@@ -53,7 +54,7 @@ var sendOut = function(request, remoteAddress) {
 
   request = addSelf(request, remoteAddress);
   peers = util.sortPeers(request.hash);
-  checkNextPeer(peers, request, 0);
+  tumour.processRequest(peers, request);
 }
 
 
@@ -82,87 +83,6 @@ var addSelf = function(requestObject, remoteAddress) {
   requestObject.ports.push(dhtPort);
   return requestObject;
 }
-
-
-// checkNextPeer and tryConnecting are mutually recursive
-// what would be better names?
-// checkNextPeer checks whether we are the closest, and TODO if we are;
-// else it calls tryConnecting
-// tryConnecting makes a connection & calls checkNextPeer on timeout or error
-
-var checkNextPeer = function(peers, request, nextPeer) {
-  next = peers[nextPeer];
-  console.log("DHT:  Checking peer " + nextPeer + ": " + next.id + " at " + next.ip);
-
-  if (next.ip === 'localhost') {
-    console.log("DHT:  I am the closest to hash " + request.hash + "!");
-    console.log("DHT:  BOW DOWN BEFORE ME PEASANTS");
-    request.ports.pop();
-    request.outbound = false;
-    request.data = tracker.execute(request.hash, request.message);
-    sendBack(request);
-    return 0;
-  }
-
-  tryConnecting(next, request, nextPeer);
-}
-
-
-var tryConnecting = function(peer, request, peerIndex) {
-  console.log("DHT:  Passing on request to " 
-      + peer.key + " at " + peer.ip + ":" + peer.port);
-
-  var conn = net.createConnection(peer.port, peer.ip, function() {
-    console.log("DHT:  Created connection to " 
-      + peer.key + " at " + peer.ip + ":" + peer.port);
-    conn.write(JSON.stringify(request) + "distro");
-  });
-
-  conn.setTimeout(5000);
-
-  var tryNextPeer = true;
-
-  var response = ""
-
-  conn.on('data', function(chunk) {
-    response += chunk;
-    if (response.substr(0,hashLen) == "distro") {
-      console.log("DHT:  Valid response from peer, will not try next");
-      tryNextPeer = false;
-    }
-  });
-  
-
-  conn.on('timeout', function() {
-    console.log("DHT:  TIMEOUT!!!");
-
-    if (tryNextPeer) {
-      checkNextPeer(peers, request, peerIndex + 1);
-      conn.end();
-    }
-
-    tryNextPeer = false;
-  });
-
-  conn.on('error', function(err) {
-    console.log("DHT:  ERROR!!! " + err.toString());
-
-    if (tryNextPeer) {
-      checkNextPeer(peers, request, peerIndex + 1);
-    }
-
-    tryNextPeer = false;
-  });
-}
-
-
-//Connection comes in on the dht port.
-//It's either going out or coming in.
-//Set an on 'data' handler to read the request into JSON, then parse it.
-//If it's going out, push the remoteAddress onto ips and our port onto ports and send it out
-//If it's going out and localhost is the closest, grab our dht data and put it in the object as a new field, set the direction flag to true and send it back
-//If it's coming back, pop off port and pop off ip and send it there
-//If it's coming back and ip is empty, pass the dht object to distroClient for consumption
 
 
 var startup = function() {
