@@ -1,4 +1,6 @@
 var net = require('net');
+var tracker = require('./distroTracker');
+
 
 var tryConnecting = function(peer, request, peerIndex) {
   console.log("Tumour:  Passing on request to " 
@@ -70,4 +72,31 @@ var checkNextPeer = function(peers, request, nextPeer) {
   tryConnecting(next, request, nextPeer);
 }
 
+
+var execute = function (hash, message) {
+  if (message.action === 'read') {
+    return readTracker(hash);
+  } 
+  // remove, update, ...?
+}
+
+
+var readTracker = function (hash) {
+  try {
+    content = fs.readFileSync('./trackers/' + hash).toString();
+  } catch (err) {
+    console.log("Tracker:  " + hash + " not found, returning empty string");
+    return "";
+  }
+
+  console.log("Tracker:  " + hash + " found"); 
+  return content;
+}
+
+
+
+exports.execute = execute;
+
 exports.processRequest = processRequest;
+
+
