@@ -3,7 +3,7 @@ var net = require('net');
 var tracker = require('./distroTracker');
 var util = require('./utils');
 var tumour = require('./tumour');
-
+var waitingCallbacks = {};
 
 var dhtHandler = function(conn) {
   req = '';
@@ -62,6 +62,7 @@ var sendBack = function(response) {
   
   if (!response.ips.length) {
     // passdht(response.data)
+    waitingCallbacks[response.message.requestID](response.data);
     console.log("DHT:  Received dht file! " + response.data);
   } else {
     var conn = net.createConnection(response.ports.pop(), response.ips.pop(), function() {
@@ -89,11 +90,14 @@ var startup = function() {
 
 
 var get = function(hash, callback) {
-  update(hash, {'action': 'read'}, callback);
+  requestID = Math.random().toString();
+  waitingCallbacks[requestID] = callback;
+  update(hash, {'action': 'read', 'requestID' : requestID});
+
 }
 
 
-var update = function(hash, message, callback) {
+var update = function(hash, message) {
   console.log("DHT:  Received get request for " + hash);
 
   var conn = net.createConnection(util.dhtPort, 'localhost', function() {
@@ -110,7 +114,6 @@ var update = function(hash, message, callback) {
 
   conn.on ('end', function() {
     console.log("DHT:  Get received response, passing to callback");
-    callback(response);
   });
 }
 
