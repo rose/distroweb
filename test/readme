@@ -1,0 +1,33 @@
+Primitive DHT test for distroweb.
+
+We have 3 peers:
+
+ff0000, wantsTracker, knows about ff00ff and 0000fe (which doesn't exist)
+  - hardcoded as Rose's computer (10.0.3.125)
+
+ff00ff, mid, knows about ff0000, 0000ff, and 000000 (which doesn't exist)
+  - hardcoded as Mindy's computer (10.0.3.226)
+
+0000ff, hasTracker, knows about ff00ff and fe0000 (which doesn't exist)
+  - hardcoded as Andree's computer (10.0.3.98)
+
+
+To run the test:
+
+1)  clone the repo (git://github.com/sudowhoami/distroweb.git) onto 3 computers.
+
+2)  decide which computer will serve each role (wantsTracker, middleman, and hasTrackerination).
+
+3)  edit the test/******Peers.json files to include the proper ip addresses.  
+
+4)  in the distroweb folder of each computer, create a symlink called peers that points to the appropriate test Peers file
+
+5)  on the wantsTracker computer, ln -s test/dhtTestTracker trackers/2000ff
+
+6)  run the DHT server (node test/dhtServer.js) on all the computers
+
+7)  run test/dhtRequest.js on the hasTracker computer
+
+8)  if it didn't work, please email us with the details.  If it did, GROVEL BEFORE OUR MIGHTY DHT, PEASANT
+
+9)  thanks :)
